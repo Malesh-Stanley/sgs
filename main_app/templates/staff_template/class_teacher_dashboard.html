@@ -1,0 +1,65 @@
+{% extends 'main_app/base.html' %}
+<!--Just another Space-->
+{% block content %}
+<div class="container">
+  <h2>{{ page_title }}</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Students</h5>
+          <p class="card-text">{{ total_students }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Subjects</h5>
+          <p class="card-text">{{ total_subjects }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a href="{% url 'view_class_students' %}" class="btn btn-primary"
+      >View Class Students</a
+    >
+    <a href="{% url 'view_individual_results' %}" class="btn btn-info"
+      >View Individual Results</a
+    >
+  </div>
+
+  <div class="mt-4">
+    <h3>Class Students</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Parent Phone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <td>{{ student.admin.get_full_name }}</td>
+            <td>{{ student.phone_number }}</td>
+            <td>
+              <a
+                href="{% url 'view_student_result' student.id %}"
+                class="btn btn-info btn-sm"
+              >
+                View Results
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

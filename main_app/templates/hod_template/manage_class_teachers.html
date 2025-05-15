@@ -1,0 +1,50 @@
+{% extends 'main_app/base.html' %}
+<!--just a space-->
+{% block content %}
+<div class="container">
+  <h2>{{ page_title }}</h2>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Staff Name</th>
+          <th>Class</th>
+          <th>Class Teacher Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for staff in staff_list %}
+        <tr>
+          <td>{{ staff.admin.get_full_name }}</td>
+          <td>{{ staff.course.name }}</td>
+          <td>
+            {% if staff.class_teacher %}
+            <span class="badge bg-success">Class Teacher</span>
+            {% else %}
+            <span class="badge bg-secondary">Regular Teacher</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" style="display: inline">
+              {% csrf_token %}
+              <input type="hidden" name="staff_id" value="{{ staff.id }}" />
+              <button
+                type="submit"
+                class="btn btn-sm {% if staff.class_teacher %}btn-danger{% else %}btn-success{% endif %}"
+              >
+                {% if staff.class_teacher %} Remove as Class Teacher
+                <!--Just space-->
+                {% else %} Make Class Teacher
+                <!--Just space-->
+                {% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

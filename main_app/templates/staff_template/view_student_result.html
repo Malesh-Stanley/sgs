@@ -1,0 +1,262 @@
+{% extends 'main_app/base.html' %}
+<!--just a space-->
+{% load static %}
+<!--just a space-->
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ page_title }}</h2>
+    <div>
+      <button
+        class="btn btn-success"
+        id="sendSmsBtn"
+        title="Send Result to Parent"
+      >
+        <i class="fas fa-paper-plane"></i>
+      </button>
+      <button
+        class="btn btn-primary"
+        id="previewBtn"
+        title="Preview and Download Result"
+      >
+        <i class="fas fa-download"></i>
+      </button>
+    </div>
+  </div>
+  <div id="resultAlert" style="display: none" class="alert" role="alert"></div>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Test Score</th>
+          <th>Exam Score</th>
+          <th>Total Score</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr>
+          <td>{{ result.subject.name }}</td>
+          <td>{{ result.test }}</td>
+          <td>{{ result.exam }}</td>
+          <td>{{ result.test|add:result.exam }}</td>
+          <td>{{ result.grade }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div
+  class="modal fade"
+  id="previewModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="previewModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="previewModalLabel">Preview Result</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-content">
+          <div class="text-center mb-4">
+            <img
+              src="{% static 'img/logo.jpeg' %}"
+              alt="School Logo"
+              class="school-logo mb-3"
+              style="max-height: 100px"
+            />
+            <h4>Juba Adventist Secondary School</h4>
+          </div>
+
+          <div class="student-info mb-4">
+            <p>
+              <strong>Student Name:</strong> {{ student.admin.get_full_name }}
+            </p>
+            <p><strong>Class:</strong> {{ student.course.name }}</p>
+            <p><strong>Academic Year:</strong> {{ current_year }}</p>
+            <p>
+              <strong>Class Teacher:</strong> {{ staff.admin.get_full_name }}
+            </p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Subject</th>
+                  <th>Test</th>
+                  <th>Exam</th>
+                  <th>Total</th>
+                  <th>Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for result in results %}
+                <tr>
+                  <td>{{ result.subject.name }}</td>
+                  <td>{{ result.test }}</td>
+                  <td>{{ result.exam }}</td>
+                  <td>{{ result.test|add:result.exam }}</td>
+                  <td>{{ result.grade }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="form-group mt-3">
+          <label for="teacherComment">Class Teacher's Comment:</label>
+          <textarea
+            class="form-control"
+            id="teacherComment"
+            rows="3"
+            placeholder="Enter your comment here..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="downloadWithComment">
+          Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Parent Phone Number Modal -->
+<div
+  class="modal fade"
+  id="parentPhoneModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="parentPhoneModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="parentPhoneModalLabel">
+          Enter Parent's Phone Number
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          class="form-control"
+          id="parentPhoneInput"
+          placeholder="e.g. +256XXXXXXXXX"
+        />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          id="sendResultWithPhoneBtn"
+        >
+          Send Result
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("sendSmsBtn").addEventListener("click", function () {
+    const studentPhone = "{{ student.phone_number|default:'' }}".trim();
+    if (!studentPhone) {
+      // Show modal to enter parent's phone number
+      $("#parentPhoneModal").modal("show");
+    } else {
+      // Send result using existing phone number
+      sendResultToParent(studentPhone);
+    }
+  });
+
+  document
+    .getElementById("sendResultWithPhoneBtn")
+    .addEventListener("click", function () {
+      const phone = document.getElementById("parentPhoneInput").value.trim();
+      if (!phone) {
+        alert("Please enter a valid phone number.");
+        return;
+      }
+      $("#parentPhoneModal").modal("hide");
+      sendResultToParent(phone);
+    });
+
+  function sendResultToParent(phoneNumber) {
+    if (!confirm("Are you sure you want to send this result to the parent?")) {
+      return;
+    }
+    fetch(`/send_result_sms/{{ student.id }}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ phone_number: phoneNumber }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        showResultAlert(data.status, data.message);
+      })
+      .catch(() => {
+        showResultAlert(false, "An error occurred while sending the result.");
+      });
+  }
+
+  function showResultAlert(success, message) {
+    const alertDiv = document.getElementById("resultAlert");
+    alertDiv.className =
+      "alert " + (success ? "alert-success" : "alert-danger");
+    alertDiv.textContent = message;
+    alertDiv.style.display = "block";
+    setTimeout(() => {
+      alertDiv.style.display = "none";
+    }, 5000);
+  }
+
+  document.getElementById("previewBtn").addEventListener("click", function () {
+    $("#previewModal").modal("show");
+  });
+
+  document
+    .getElementById("downloadWithComment")
+    .addEventListener("click", function () {
+      const comment = document.getElementById("teacherComment").value;
+      window.location.href = `/download_student_result/{{ student.id }}/?comment=${encodeURIComponent(
+        comment
+      )}`;
+    });
+</script>
+{% endblock %}

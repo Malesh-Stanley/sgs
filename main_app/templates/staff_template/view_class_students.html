@@ -1,0 +1,54 @@
+{% extends 'main_app/base.html' %}
+<!-- Just a space -->
+{% block content %}
+<div class="container">
+  <h2>{{ page_title }}</h2>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Parent Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.admin.get_full_name }}</td>
+          <td>{{ student.phone_number }}</td>
+          <td>
+            <button
+              class="btn btn-success btn-sm send-sms"
+              data-student-id="{{ student.id }}"
+            >
+              Send Results
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".send-sms").forEach((button) => {
+    button.addEventListener("click", function () {
+      const studentId = this.dataset.studentId;
+      if (confirm("Are you sure you want to send results to this parent?")) {
+        fetch(`/send_result_sms/${studentId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert(data.message);
+          });
+      }
+    });
+  });
+</script>
+{% endblock %}
