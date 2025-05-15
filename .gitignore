@@ -1,5 +1,6 @@
 .vscode
 .idea
+.env
 *.pyc
 media/
 main_app/migrations/*

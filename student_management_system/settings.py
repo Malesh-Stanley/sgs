@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import dj_database_url
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,13 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "pg8*d3f9q7=0g7b7jh&im5+^@q_cvl)!dgo$$*)(8f##dgkdzu"  # Consider using your secret key
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # ALLOWED_HOSTS = ['smswithdjango.herokuapp.com']
-ALLOWED_HOSTS = []  # Not recommended but useful in dev mode
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
@@ -158,7 +160,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS') 
+EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "Student Management System <admin@admin.com>"
@@ -174,6 +176,6 @@ DATABASES['default'].update(prod_db)
 #VONAGE_API_SECRET = 'L3NM14r866joZrT7'
 #VONAGE_BRAND_NAME = 'JASS'
 
-TWILIO_ACCOUNT_SID = 'AC23d9f1f3117ef140c1e4c7e1ce8f609b'
-TWILIO_AUTH_TOKEN = 'e80da7eb28332ab15c1a1a5c60810eba'
-TWILIO_PHONE_NUMBER = '+17622454733'  # Your Twilio number 
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER') 
