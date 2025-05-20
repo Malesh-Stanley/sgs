@@ -5,7 +5,8 @@
             "src": "student_management_system/wsgi.py",
             "use": "@vercel/python",
             "config": {
-                "runtime": "python3.9"
+                "runtime": "python3.9",
+                "maxLambdaSize": "250mb"
             }
         },
         {
@@ -31,6 +32,9 @@
         }
     ],
     "env": {
-        "PYTHONPATH": "."
+        "PYTHONPATH": ".",
+        "SECRET_KEY": "@secret_key",
+        "DEBUG": "False",
+        "ALLOWED_HOSTS": ".vercel.app"
     }
 }

@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Install Python dependencies
-python3 -m pip install -r requirements.txt
+python3 -m pip install --no-cache-dir -r requirements.txt
 
-# Collect static files
-python3 manage.py collectstatic --noinput
-
-# Create staticfiles directory if it doesn't exist
+# Create staticfiles directory
 mkdir -p staticfiles
 
+# Collect static files
+python3 manage.py collectstatic --noinput --clear
+
 # Copy static files to staticfiles directory
-cp -r static/* staticfiles/
+cp -r static/* staticfiles/ 2>/dev/null || :
