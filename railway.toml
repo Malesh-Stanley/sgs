@@ -3,8 +3,14 @@ builder = "nixpacks"
 buildCommand = "python manage.py collectstatic --noinput"
 
 [deploy]
-startCommand = "gunicorn student_management_system.wsgi:application"
+startCommand = "gunicorn student_management_system.wsgi:application --timeout 120"
 healthcheckPath = "/"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 10 
+restartPolicyMaxRetries = 10
+
+[phases.setup]
+nixPkgs = ['python39', 'postgresql']
+
+[phases.install]
+cmds = ['pip install -r requirements.txt'] 
