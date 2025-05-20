@@ -8,7 +8,7 @@ healthcheckPath = "/"
 healthcheckTimeout = 300
 
 [phases.setup]
-nixPkgs = ['python39', 'postgresql']
+nixPkgs = ['python39', 'postgresql', 'zlib', 'libjpeg', 'libpng', 'gcc']
 
 [phases.install]
-cmds = ['pip install -r requirements.txt']
+cmds = ['pip install --no-cache-dir -r requirements.txt']
