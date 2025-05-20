@@ -13,7 +13,7 @@ from .forms import *
 from .models import *
 
 #My additional imports
-import vonage
+#import vonage
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from reportlab.lib import colors
