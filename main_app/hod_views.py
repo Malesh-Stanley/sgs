@@ -52,7 +52,7 @@ def add_staff(request):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
-            course = form.cleaned_data.get('class')
+            course = form.cleaned_data.get('course')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -347,7 +347,7 @@ def edit_subject(request, subject_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            course = form.cleaned_data.get('class')
+            course = form.cleaned_data.get('course')
             staff = form.cleaned_data.get('staff')
             try:
                 subject = Subject.objects.get(id=subject_id)
