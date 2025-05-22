@@ -53,17 +53,34 @@ def add_staff(request):
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
             course = form.cleaned_data.get('course')
+            
+            # Validate course
+            if not course:
+                messages.error(request, "Please select a course")
+                return render(request, 'hod_template/add_staff_template.html', context)
+            
             passport = request.FILES.get('profile_pic')
+            if not passport:
+                messages.error(request, "Please upload a profile picture")
+                return render(request, 'hod_template/add_staff_template.html', context)
+                
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
             passport_url = fs.url(filename)
             try:
+                # Create the user - this will trigger the signal to create Staff
                 user = CustomUser.objects.create_user(
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.staff.course = course
                 user.save()
+                
+                # Get the staff instance created by the signal
+                staff = Staff.objects.get(admin=user)
+                # Update the course
+                staff.course = course
+                staff.save()
+                
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_staff'))
 
@@ -83,30 +100,53 @@ def add_student(request):
             first_name = student_form.cleaned_data.get('first_name')
             last_name = student_form.cleaned_data.get('last_name')
             address = student_form.cleaned_data.get('address')
-            #email = student_form.cleaned_data.get('email')
+            email = student_form.cleaned_data.get('email')
             gender = student_form.cleaned_data.get('gender')
-           # password = student_form.cleaned_data.get('password')
+            password = student_form.cleaned_data.get('password')
             course = student_form.cleaned_data.get('course')
             session = student_form.cleaned_data.get('session')
             passport = request.FILES['profile_pic']
             phone_number = student_form.cleaned_data['phone_number'] 
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+            
             try:
+                # Check if user with this email already exists
+                if CustomUser.objects.filter(email=email).exists():
+                    messages.error(request, "Email already exists!")
+                    return render(request, 'hod_template/add_student_template.html', context)
+                
+                fs = FileSystemStorage()
+                filename = fs.save(passport.name, passport)
+                passport_url = fs.url(filename)
+                
+                # Create the user first
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
+                    email=email, 
+                    password=password, 
+                    user_type=3, 
+                    first_name=first_name, 
+                    last_name=last_name, 
+                    profile_pic=passport_url
+                )
                 user.gender = gender
                 user.address = address
-                user.student.session = session
-                user.student.course = course
                 user.save()
+                
+                # Create student with course and session
+                student = Student.objects.create(
+                    admin=user,
+                    course=course,
+                    session=session,
+                    phone_number=phone_number
+                )
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_student'))
             except Exception as e:
+                # If anything goes wrong, clean up the created user
+                if 'user' in locals():
+                    user.delete()
                 messages.error(request, "Could Not Add: " + str(e))
         else:
-            messages.error(request, "Could Not Add: ")
+            messages.error(request, "Please fill all required fields correctly")
 
     return render(request, 'hod_template/add_student_template.html', context)
 
@@ -281,9 +321,9 @@ def edit_student(request, student_id):
                 user.first_name = first_name
                 user.last_name = last_name
                 student.session = session
+                student.course = course
                 user.gender = gender
                 user.address = address
-                student.course = course
                 user.save()
                 student.save()
                 messages.success(request, "Successfully Updated")

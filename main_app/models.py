@@ -88,7 +88,7 @@ class Student(models.Model):
 
 class Staff(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
     class_teacher = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

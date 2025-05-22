@@ -75,13 +75,29 @@
       <div class="modal-body">
         <div class="preview-content">
           <div class="text-center mb-4">
-            <img
-              src="{% static 'img/logo.jpeg' %}"
-              alt="School Logo"
-              class="school-logo mb-3"
-              style="max-height: 100px"
-            />
-            <h4>Juba Adventist Secondary School</h4>
+            <div class="row align-items-center">
+              <div class="col-md-3">
+                <img
+                  src="{% static 'img/logo.jpeg' %}"
+                  alt="School Logo"
+                  class="school-logo mb-3"
+                  style="max-height: 100px"
+                />
+              </div>
+              <div class="col-md-6">
+                <h4>Juba Adventist Secondary School</h4>
+                <p class="mb-1">Seventh-day Round About, Juba, South Sudan</p>
+                <p class="mb-0">Phone: +211 923 580 078</p>
+              </div>
+              <div class="col-md-3">
+                <img
+                  src="{{ student.admin.profile_pic }}"
+                  alt="Student Photo"
+                  class="student-photo mb-3"
+                  style="max-height: 100px; border-radius: 5px"
+                />
+              </div>
+            </div>
           </div>
 
           <div class="student-info mb-4">
