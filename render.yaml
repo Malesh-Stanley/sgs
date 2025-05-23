@@ -3,7 +3,7 @@ services:
     name: student-management-system
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn student_management_system.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: gunicorn student_management_system.wsgi:application
     branch: main
     region: oregon # You can change this if needed
     plan: free # Change to 'starter' or 'pro' if you're on a paid plan
