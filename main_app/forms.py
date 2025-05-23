@@ -56,22 +56,16 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    # New additional lines
-    email = forms.EmailField(label="Email", max_length=50, widget=forms.EmailInput(attrs={"class":"form-control"}))
-    password = forms.CharField(label="Password", max_length=50, widget=forms.PasswordInput(attrs={"class":"form-control"}))
-    full_name = forms.CharField(label="Full Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
-    address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     phone_number = forms.CharField(label="Phone Number", max_length=15, widget=forms.TextInput(attrs={"class":"form-control"}))
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), label="Course", widget=forms.Select(attrs={"class":"form-control"}))
+    session = forms.ModelChoiceField(queryset=Session.objects.all(), label="Session", widget=forms.Select(attrs={"class":"form-control"}))
     
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
 
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields + \
-            ['course', 'session']
+        fields = CustomUserForm.Meta.fields + ['course', 'session', 'phone_number']
 
 
 class AdminForm(CustomUserForm):
