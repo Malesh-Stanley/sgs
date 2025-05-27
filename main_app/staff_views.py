@@ -584,6 +584,11 @@ def view_student_result(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     results = StudentResult.objects.filter(student=student)
     
+    # Calculate grades for each result
+    for result in results:
+        total_score = result.test + result.exam
+        result.grade = calculate_grade(total_score)
+    
     context = {
         'student': student,
         'results': results,
